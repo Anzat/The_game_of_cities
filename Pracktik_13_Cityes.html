@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE-edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Practik</title>
+    <style>
+      .gamerScore {
+        margin: 0 0 0 10px;
+        color: crimson;
+      }
+      .gamer {
+        width: auto;
+        display: flex;
+        font-size: 20px;
+        text-align: center;
+        align-content: center;
+      }
+      .tablo {
+        width: 400px;
+        height: 132px;
+        background-color: burlywood;
+        border-radius: 9px;
+        padding: 10px;
+        margin: 5px;
+      }
+      #parent {
+        margin: 0 auto;
+        width: 400px;
+      }
+      h2 {
+        transition: all 1.5s ease-in-out;
+        text-align: center;
+        margin: 10px auto;
+        padding: 40px 10px 40px 10px;
+      }
+      .container {
+        width: 100vh;
+        height: 100vh;
+        background-color: beige;
+      }
+      .rightAnswer {
+        color: white;
+      }
+      .tab {
+        margin-bottom: 10px;
+      }
+      .tab .link a {
+        display: block;
+        padding: 10px;
+        color: black;
+        text-decoration: none;
+        text-align: center;
+        background: #f8f8f8;
+        border: 1px solid gray;
+      }
+      .tab .link:hover a {
+        background: #f2f2f2;
+      }
+      .tab:not(.active) .text {
+        display: none;
+      }
+      .tab .text {
+        border: 1px dashed gray;
+        border-top: none;
+        padding: 10px;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container" class="container">
+      <h2>Игра в города</h2>
+      <input id="field" placeholder="Введите название города" />
+      <div id="message">Все введенные города</div>
+      <div id="answer"></div>
+      <div id="tablo" class="tablo">
+        <div id="gamer1" class="gamer">
+          <div id="gamer1Label">1 Игрок:</div>
+          <div id="gamerScore1" class="gamerScore">0</div>
+        </div>
+        <div id="gamer2" class="gamer">
+          <div id="gamer2Label">2 Игрок:</div>
+          <div id="gamerScore2" class="gamerScore">0</div>
+        </div>
+        <div id="currentPlayerLabel" class="currentPlayerLabel"></div>
+      </div>
+    </div>
+    <script>
+      let field = document.querySelector("#field");
+      let message = document.querySelector("#message");
+      let answer = document.querySelector("#answer");
+      let gamerScore1 = document.querySelector("#gamerScore1");
+      let gamerScore2 = document.querySelector("#gamerScore2");
+      let currentPlayerLabel = document.querySelector("#currentPlayerLabel");
+      let score1 = 1; // Очки 1 игрока
+      let score2 = 0; // Очки 2 игрока
+      let cities = [];
+      let currentPlayer = 2;
+
+      // Event listener for the 'change' event on the field input
+      field.addEventListener("change", checkCity);
+
+      // Event listener for the 'focus' event on the field input
+      field.addEventListener("focus", function () {
+        field.value = "";
+        field.setAttribute("placeholder", "Введите название города");
+      });
+
+      // Function to check the city
+      function checkCity() {
+        getRepeatWord();
+        let firstChar = field.value.charAt(0).toUpperCase();
+        let endChar = field.value.slice(-1).toUpperCase();
+
+        if (cities.length > 0) {
+          const lastCityBd = cities[cities.length - 1];
+          if (lastCityBd.slice(-1).toUpperCase() === firstChar) {
+            answer.textContent = "ПРАВИЛЬНЫЙ ОТВЕТ!"; // Correct answer
+            answer.classList.add("rightAnswer");
+            answer.style.backgroundColor = "green";
+            answer.style.width = "500px";
+            answer.style.transition = "all 0.5s ease-in-out";
+          } else {
+            answer.textContent = "NOT RIGHT!";
+            answer.classList.remove("rightAnswer");
+            answer.style.backgroundColor = "red";
+            answer.style.width = "500px";
+          }
+          if (currentPlayer === 1) {
+            score1++;
+          } else {
+            score2++;
+          }
+          currentPlayer = 3 - currentPlayer; // Toggle between player 1 and player 2
+        }
+
+        cities.push(field.value.toUpperCase());
+        apdateLabelCities();
+        field.value = "";
+        currentPlayerLabel.textContent = `Сейчас ходит игрок -  ${currentPlayer}`; // Выводим текущего игрока
+      }
+
+      function apdateLabelCities() {
+        message.textContent = `Города в Массиве: - ${cities}`;
+        gamerScore1.textContent = score1;
+        gamerScore2.textContent = score2;
+      }
+
+      function createBtnDel() {
+        let btnDel = document.createElement("button");
+        answer.parentNode.appendChild(btnDel);
+        btnDel.textContent = "Delete last word";
+
+        btnDel.addEventListener("click", () => {
+          if (cities.length > 1) {
+            cities.pop();
+            apdateLabelCities();
+            if (currentPlayer === 2) {
+              score1--;
+            } else {
+              score2--;
+            }
+          }
+          currentPlayer = 3 - currentPlayer; // Toggle between player 1 and player 2
+          gamerScore1.textContent = score1;
+          gamerScore2.textContent = score2;
+          currentPlayerLabel.textContent = `Сейчас ходит игрок -  ${currentPlayer}`; // Выводим текущего игрока
+        });
+      }
+      createBtnDel();
+
+      function getRepeatWord() {
+        let lastWord = field.value.toUpperCase();
+        if (cities.includes(lastWord)) {
+          alert(`Слово - ${lastWord} уже было, придумайте другое!`);
+          field.value = "";
+        }
+      }
+    </script>
+  </body>
+</html>
